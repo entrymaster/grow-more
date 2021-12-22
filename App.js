@@ -1,11 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import AppNavigation from './Navigation/AppNavigation';
+import FlashMessage from "react-native-flash-message";
 
 export default function App() {
+
+  global.baseURL = 'https://supariderbackend.herokuapp.com/'
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+      <AppNavigation /> 
       <StatusBar style="auto" />
+      <FlashMessage position="top" statusBarHeight={35} />
     </View>
   );
 }
@@ -14,7 +20,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
