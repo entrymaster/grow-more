@@ -92,7 +92,7 @@ const SignUpPage = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <LinearGradient style={{ flex: 1 }} colors={["#26272C", "#E52B44"]}>
+        <LinearGradient style={{ flex: 1 }} colors={["#91EAE4", "#2b5c4c"]}>
         <ScrollView
           keyboardShouldPersistTaps="handled" 
           showsVerticalScrollIndicator={false}>
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     height: 200,
     // flex:1,
     width: 200,
-    // marginVertical: 30,
+    marginVertical: 30,
     alignSelf: "center",
     resizeMode: "contain",
   },
@@ -274,12 +274,12 @@ const styles = StyleSheet.create({
   },
   loginBtnText: {
     textAlign: "center",
-    color: "#DE284B",
+    color: "#2b5c4c",
     fontSize: 18,
     fontWeight: "bold",
   },
   bottomTextView: {
-    marginBottom:10,
+    marginBottom:20,
     flexDirection: "row",
     alignSelf: "center",
   },

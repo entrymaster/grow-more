@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { StackNav, TimesDrawer, Auth } from "./TimesNavigation";
+import { SideDrawer, Auth, StackNav } from "./GrowMoreNavigation";
 import { NavigationContainer } from "@react-navigation/native";
 import StartingScreen from "../Screens/StartingScreen";
 import { AuthContext } from "../Context";
@@ -39,7 +39,7 @@ export const AppNavigation = () => {
   return (
     <AuthContext.Provider value={authContext}>
       <NavigationContainer>
-        { storage ? <TimesDrawer /> : <Auth />}
+        { storage ? <StackNav /> : <Auth />}
       </NavigationContainer>
     </AuthContext.Provider>
   );

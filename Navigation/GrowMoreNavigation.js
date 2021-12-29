@@ -3,8 +3,18 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoginPage from '../Screens/LoginPage';
+import SignUpPage from '../Screens/SignUpPage';
+import StartingScreen from '../Screens/StartingScreen';
+import Dashboard from '../Screens/Dashboard';
+import CropRecommender from '../Screens/CropRecommender';
+import News from '../Screens/News';
+import CropList from '../Screens/CropList';
+import History from '../Screens/History';
+import { Alert } from 'react-native'
+import { AuthContext } from "../Context";
+import WeatherFetch from '../Screens/WeatherFetch';
 
 const Authnavigator = createStackNavigator();
 export const Auth = () => {
@@ -45,23 +55,17 @@ export const StackNav = () => {
     return (
         <MainStackNavigator.Navigator>
             <MainStackNavigator.Screen name="BottomTab" component={TabNavigation} options={{ headerShown: false, title: "Home" }} />
+            {/* <MainStackNavigator.Screen name="WeatherFetch" component={WeatherFetch} options={{ headerShown: false, title: "Recommender" }} /> */}
 
-            {/* <MainStackNavigator.Screen name="Events" component={Events} options={{
-    title: '', headerStyle: { backgroundColor: '#500935', },
-    headerTintColor: '#fff',
-    headerTitleStyle: {
-        fontWeight: 'bold',
-    },
-}} /> */}
-            <MainStackNavigator.Screen name="AddEvent" component={AddEvent} options={{
+            {/* <MainStackNavigator.Screen name="CropRecommender" component={CropRecommender} options={{
                 title: '', headerStyle: { backgroundColor: '#500935', },
                 headerTintColor: '#000',
                 headerTitleStyle: {
                     fontWeight: 'bold',
                 },
             }} />
-            <MainStackNavigator.Screen name="ChatScreen" component={ChatScreen} options={{ headerShown: false, title: "ChatScreen" }}
-            />
+            <MainStackNavigator.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false, title: "ChatScreen" }}
+            /> */}
         </MainStackNavigator.Navigator>
     )
 }
@@ -75,37 +79,38 @@ export const TabNavigation = (props) => {
             screenOptions={({ route, navigation }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
                     let iconName;
-                    if (route.name === 'HomePage') {
-                        iconName = focused ? 'briefcase-search' : 'briefcase-clock';
-                    } else if (route.name === 'Jobs') {
-                        iconName = focused ? 'book-open-variant' : 'book-open-page-variant';
+                    if (route.name === 'News') {
+                        iconName = focused ? 'newspaper-variant' : 'newspaper-variant-outline';
+                    } else if (route.name === 'Recommender') {
+                        iconName = focused ? 'thumb-up' : 'thumb-up-outline';
 
-                    } else if (route.name === 'Courses') {
+                    } else if (route.name === 'CropList') {
                         iconName = focused ? 'format-list-bulleted-square' : 'format-list-text';
-                    } else if (route.name === 'Events') {
-                        iconName = focused ? 'calendar' : 'calendar-account';
+                    } else if (route.name === 'History') {
+                        iconName = focused ? 'history' : 'history';
                     } /* else if (route.name === 'HRpro') {
 							iconName = focused ? 'account-convert' : 'account-multiple-plus';
 						} */
-                    else if (route.name === 'RemoteWork') {
-                        iconName = focused ? 'account-convert' : 'account-multiple-plus';
+                    else if (route.name === 'Dashboard') {
+                        iconName = focused ? 'view-dashboard' : 'view-dashboard-outline';
                     }
                     // You can return any component that you like here!
-                    return <MaterialCommunityIcons name={iconName} size={24} color={color} />;
+                    return <MaterialCommunityIcons name={iconName} size={route.name === 'Recommender'?32:24} color={color} />;
                 },
             })}
             tabBarOptions={{
                 keyboardHidesTabBar: true,
-                style: { backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', alignSelf: 'center', paddingBttom: 10, },
-                activeTintColor: '#F02F39',
+                style: { backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', alignSelf: 'center' },
+                activeTintColor: '#2b5c4c',
                 inactiveTintColor: 'grey',
             }}>
-            <TimesBottomTab.Screen name="HomePage" component={HomePage} options={{ title: 'Careers' }} />
-            <TimesBottomTab.Screen name="Jobs" component={Jobs} options={{ title: 'Jobs' }} />
-            <TimesBottomTab.Screen name="Courses" component={Courses} options={{ title: 'Courses', }} />
-            <TimesBottomTab.Screen name="Events" component={Events} options={{ title: 'Events', }} />
-            {/* <TimesBottomTab.Screen name="HRpro" component={HRpro} options={{ title: 'HR Pro', }} /> */}
-            <TimesBottomTab.Screen name="RemoteWork" component={RemoteWork} options={{ title: 'Remote Work', }} />
+            <TimesBottomTab.Screen name="News" component={News} options={{ title: 'Farming News', headerStyle:{backgroundColor:'#2b5c4c' },
+            headerTitleStyle:{color:'#fff'} }} />
+            <TimesBottomTab.Screen name="CropList" component={CropList} options={{ title: 'Crop List' }} />
+            <TimesBottomTab.Screen name="Recommender" component={CropRecommender} options={{ title: 'Recommender',headerStyle:{backgroundColor:'#2b5c4c' },
+            headerTitleStyle:{color:'#fff'} }} />
+            <TimesBottomTab.Screen name="History" component={History} options={{ title: 'History', }} />
+            <TimesBottomTab.Screen name="Dashboard" component={Dashboard} options={{ title: 'Dashboard', }} />
         </TimesBottomTab.Navigator>
 
     );
@@ -113,20 +118,46 @@ export const TabNavigation = (props) => {
 
 const Drawer = createDrawerNavigator();
 
-export const TimesDrawer = () => {
+export const SideDrawer = () => {
+    const { logOut } = React.useContext(AuthContext);
+
+    const handleLogout = async () => {
+
+        //console.log('hh')
+        const clearData = await AsyncStorage.clear();
+        AsyncStorage.getItem("userData").then((value) => {
+            let parseData = JSON.parse(value);
+            //console.log(parseData);
+        })
+        //console.log(clearData)
+        logOut();
+
+    };
+    const LogOutPressed = () => {
+        Alert.alert(
+            'Logout Suparider',
+            'Are you sure you want to logout ? ',
+            [
+                { text: 'OK', onPress: () => { handleLogout() } },
+                { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+            ],
+            { cancelable: false }
+        );
+        return true;
+    };
     return (
 
         <Drawer.Navigator drawerStyle={{ backgroundColor: '#f8f8f8' }}
-            drawerContent={(props) => <SideDrawer {...props} />}
+            // drawerContent={(props) => <SideDrawer {...props} />}
             drawerContentOptions={{
                 activeTintColor: '#e91e63',
             }}>
-            <Drawer.Screen name="Career" component={StackNav} />
-            <Drawer.Screen name="Interview and GD Prep" component={InterViewAndGD} />
-            <Drawer.Screen name="Resume Writing" component={InterViewAndGD} />
-            <Drawer.Screen name="HR Pro" component={HRpro} />
-            <Drawer.Screen name="Mentorship" component={InterViewAndGD} />
-            <Drawer.Screen name="News And Info" component={NewsAndInfo} />
+            <Drawer.Screen name="News" component={StackNav} />
+            {/* <Drawer.Screen name="Interview and GD Prep" component={CropRecommender} />
+            <Drawer.Screen name="Resume Writing" component={CropRecommender} />
+            <Drawer.Screen name="HR Pro" component={CropRecommender} />
+            <Drawer.Screen name="Mentorship" component={CropRecommender} />
+            <Drawer.Screen name="Logout" component={LogOutPressed} /> */}
 
         </Drawer.Navigator>
 

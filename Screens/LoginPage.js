@@ -33,73 +33,76 @@ const LoginPage = ({ navigation }) => {
   };
   const SubmitLogin = () => {
     if (!loginID) {
-        showMessage({
-          message: "Please fill username !",
-          type: "warning",
-          icon: "warning",
-          duration: 3500,
-        });
-      }else if (!password) {
-        showMessage({
-          message: "Please fill password !",
-          type: "warning",
-          icon: "warning",
-          duration: 3500,
-        });
-      } else {
-          setLoading(true)
-    fetch( global.baseURL + "users/login", {
-      method: "POST",
-      timeout: 10000,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: loginID,
-        token:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvbnN0YXJrIiwiaWF0IjoxNjM4MTI5MDY0fQ.TjTX5RMII5buB8KLqDycXNI3byWelLPpFQGjJilw0J8",
-        password: password,
-      }),
-    })
-      .then((response) => response.json())
-      // .then((json) => console.log(json))
-      .then((result) => {
-        if(result.message === "Login successful"){
+      showMessage({
+        message: "Please fill username !",
+        type: "warning",
+        icon: "warning",
+        duration: 3500,
+      });
+    } else if (!password) {
+      showMessage({
+        message: "Please fill password !",
+        type: "warning",
+        icon: "warning",
+        duration: 3500,
+      });
+    } else {
+      saveDataToStorage("success");
+      login();
+      setLoading(true)
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MWNjOGVlMzY3NmI5OGNmYmY2OTcyZjUiLCJ0eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQwODEwNTAzLCJpYXQiOjE2NDA3OTYxMDN9.8nhDLrATTnEkNbiL8kGrbUemooeUyjCnzsFKszA1Tew");
+
+      var raw = JSON.stringify({
+        "email": "faisal@gmail.com",
+        "password": "faisal@21"
+      });
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+      };
+
+      fetch( global.baseURL +"v1/auth/login", requestOptions)
+        .then(response => response.json())
+        .then(result => {
+          if (result.message === "Login successful") {
             showMessage({
-                message: "Login Successful!",
-                type: "success",
-                icon: "success",
-                duration: 3500,
-              });
+              message: "Login Successful!",
+              type: "success",
+              icon: "success",
+              duration: 3500,
+            });
             saveDataToStorage("success");
             login();
             // alert('hi')
-          // if (result.status_code === 200 && result.status === "SUCCESS") {
-          // }
-        }
-      })
-      // .finally(() => setLoading(false))
-      .catch((error) => console.log(error));
+            // if (result.status_code === 200 && result.status === "SUCCESS") {
+            // }
+          }
+        })
+        .catch(error => console.log('error', error));
     }
   };
 
   return (
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <LinearGradient style={{ flex: 1,justifyContent:'space-around' }} colors={["#26272C", "#E52B44"]}>
+        <LinearGradient style={{ flex: 1, justifyContent: 'space-around' }} colors={["#91EAE4", "#2b5c4c"]}>
           <KeyboardAvoidingView
-      behavior={"position"}
-      
-      
-    >
-      <View>
-             
+            behavior={"position"}
+
+
+          >
+            <View>
+
               <Image
                 style={styles.logoImg}
                 source={require("../assets/logo.png")}
               />
-             
+
               <View style={styles.fieldContainer}>
                 <Text style={styles.headingText}>Login</Text>
                 <View style={styles.horizontalLine} />
@@ -113,28 +116,28 @@ const LoginPage = ({ navigation }) => {
                 />
                 <Text style={styles.inputBoxLabel}>Password</Text>
                 <View>
-                <View style={{flexDirection:'row',marginRight:25}}>
-                  <TextInput
-                    selectionColor="#FFFFFF"
-                    secureTextEntry={passHidden}
-                    style={styles.inputBox}
-                    onChangeText={(text) => setPassword(text)}
-                    value={password}
-                    autoCapitalize="none"
-                  />
-                  <TouchableOpacity
-                    activeOpacity={1}
-                    style={styles.eyeIcon}
-                    onPress={() => setPassHidden(!passHidden)}
-                  >
-                    <Ionicons
-                      name={
-                        passHidden ? "ios-eye-off-outline" : "ios-eye-outline"
-                      }
-                      size={25}
-                      color="white"
+                  <View style={{ flexDirection: 'row', marginRight: 25 }}>
+                    <TextInput
+                      selectionColor="#FFFFFF"
+                      secureTextEntry={passHidden}
+                      style={styles.inputBox}
+                      onChangeText={(text) => setPassword(text)}
+                      value={password}
+                      autoCapitalize="none"
                     />
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      activeOpacity={1}
+                      style={styles.eyeIcon}
+                      onPress={() => setPassHidden(!passHidden)}
+                    >
+                      <Ionicons
+                        name={
+                          passHidden ? "ios-eye-off-outline" : "ios-eye-outline"
+                        }
+                        size={25}
+                        color="white"
+                      />
+                    </TouchableOpacity>
                   </View>
                   <TouchableOpacity>
                     <Text style={styles.forgotText}>Forgot Password?</Text>
@@ -156,13 +159,13 @@ const LoginPage = ({ navigation }) => {
             </View>
           </KeyboardAvoidingView>
           <View style={styles.bottomTextView}>
-              <Text style={styles.bottomText}>Don't have an account? </Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("SignUpPage")}
-              >
-                <Text style={styles.signupText}>SIGN UP</Text>
-              </TouchableOpacity>
-            </View>
+            <Text style={styles.bottomText}>Don't have an account? </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("SignUpPage")}
+            >
+              <Text style={styles.signupText}>SIGN UP</Text>
+            </TouchableOpacity>
+          </View>
         </LinearGradient>
       </TouchableWithoutFeedback>
     </View>
@@ -191,9 +194,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
   },
   logoImg: {
-    height: 300,
+    height: 250,
     // flex:1,
-    width: 300,
+    width: 250,
     // marginVertical: 30,
     alignSelf: "center",
     resizeMode: "contain",
@@ -202,7 +205,7 @@ const styles = StyleSheet.create({
     // marginTop: 20,
     // paddingBottom: 10,
     paddingHorizontal: 30,
-   
+
   },
   headingText: {
     fontWeight: "600",
@@ -231,10 +234,10 @@ const styles = StyleSheet.create({
     marginTop: '10%',
   },
   eyeIcon: {
-      borderBottomWidth:1,
-      padding:1,
+    borderBottomWidth: 1,
+    padding: 1,
     //   marginRight:10,
-      borderBottomColor:'#fff'
+    borderBottomColor: '#fff'
     // position: "absolute",
     // right: 5,top: 0, left: 0, right: 0, bottom: 0,
   },
@@ -257,7 +260,7 @@ const styles = StyleSheet.create({
   },
   loginBtnText: {
     textAlign: "center",
-    color: "#DE284B",
+    color: "#2b5c4c",
     fontSize: 18,
     fontWeight: "bold",
   },

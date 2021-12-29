@@ -14,13 +14,13 @@ const StartingScreen = ({navigation}) => {
     return (
         <View style={styles.container}>
         <View style={styles.headingContainer}>
-            <Text style={styles.headingText}>Hello</Text>
-            <Text style={styles.headingDesc}>Welcome to Supariders</Text>
-            <Text style={styles.goldText}>Learn more about Supariders</Text>
+            <Text style={styles.headingText}>namaste</Text>
+            <Text style={styles.headingDesc}>We are here to grow</Text>
+            {/* <Text style={styles.goldText}>Learn more about Supariders</Text> */}
         </View>
         <Image
                 style={styles.logoImg}
-                source={require("../assets/logo.png")}
+                source={require("../assets/starting-banner.png")}
               />
               {
                   isLoading ? <ActivityIndicator size="large" color="white"
@@ -46,7 +46,7 @@ const StartingScreen = ({navigation}) => {
 
 const styles = StyleSheet.create({
     container:{
-        backgroundColor: '#26272C',
+        backgroundColor: '#fff',
         flex:1,
         justifyContent:'space-around'
     },
@@ -55,13 +55,13 @@ const styles = StyleSheet.create({
     },
     headingText:{
         fontSize:70,
-        color:'#fff',
+        color:'#d7be69',
         fontWeight:"bold",
         textAlign:'center',
     },
     headingDesc:{
-        fontSize:16,
-        color:'#fff',
+        fontSize:20,
+        color:'#2b5c4c',
         fontWeight:"bold",
         textAlign:'center',
     },
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
           color:'#fff',
           fontSize:20,
           textAlign:'center',
-          backgroundColor:'#000',
+          backgroundColor:'#5b8462',
             // marginTop:'20%'
         //   position:'absolute',
         //   bottom: 100
