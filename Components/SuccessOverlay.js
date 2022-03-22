@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
         color:'#0cac75',
         fontWeight:'bold',
         textAlign:'center',
-        marginTop:30
+        paddingVertical:20
 
     },
     overlayText: {

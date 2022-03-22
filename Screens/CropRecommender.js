@@ -54,6 +54,11 @@ const CropRecommender = ({ navigation }) => {
     // }, []);
 
     useEffect(() => {
+        fetchLocation()
+    }, [])
+    
+
+    useEffect(() => {
         if (weatherData !== null) {
             setHumidity(Math.round(weatherData.humidity.mean))
             setTemperature(Math.round(weatherData.temp.mean - 273.15))
@@ -63,6 +68,7 @@ const CropRecommender = ({ navigation }) => {
     }, [weatherData])
 
     const getWeatherData = async () => {
+        setLoading('weatherFetching');
         const requestURL = BASE_WEATHER_URL + "month=12&lat=" + userLocation.latitude + "&lon=" + userLocation.longitude + "&appid=" + WEATHER_API_KEY;
 
         await fetch(requestURL)
@@ -113,7 +119,7 @@ const CropRecommender = ({ navigation }) => {
                 // setFormProgress('weather')
                 setVisible(true);
                 // navigation.navigate('WeatherFetch')
-            }, 500);
+            }, 200);
         }
 
     }
@@ -124,7 +130,7 @@ const CropRecommender = ({ navigation }) => {
     // }
 
     const fetchLocation = async () => {
-        setLoading('weatherFetching');
+        
         if (Platform.OS === 'android' && !Constants.isDevice) {
             setErrorMsg(
                 'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
@@ -140,12 +146,12 @@ const CropRecommender = ({ navigation }) => {
         let location = await Location.getCurrentPositionAsync({});
         // setLocation(location);
         setUserLocation(location.coords);
-        setTimeout(() => {
-            if (userLocation) {
-                getWeatherData()
-            }
+        // setTimeout(() => {
+        //     if (userLocation) {
+                
+        //     }
 
-        }, 200);
+        // }, 200);
     }
 
     const goBack = () => {
@@ -204,40 +210,8 @@ const CropRecommender = ({ navigation }) => {
                 duration: 3500,
             });
         } else {
-            // console.log(accessToken);
-            // setLoading('finalSubmit')
-            // var myHeaders = new Headers();
-            // myHeaders.append("Content-Type", "application/json");
-            // myHeaders.append("Authorization", 'Bearer '+accessToken);
-
-            // var raw = JSON.stringify({
-            //     arr: [
-            //         (nitrogen),
-            //         (phosphorus),
-            //         (potassium),
-            //         (temperature.toString()),
-            //         (humidity.toString()),
-            //         (pH),
-            //         (rainfall.toString())
-            //     ]
-            // });
-
-            // var requestOptions = {
-            //     method: 'POST',
-            //     headers: myHeaders,
-            //     body: raw,
-            //     // redirect: 'follow'
-            // };
-            // console.log(raw);
-            // fetch(global.baseURL + "v1/model", requestOptions)
-            //     .then(response => response.json())
-            //     .then(result => {
-            //         console.log(result);
-            //         setPredictedCrop(result.crop_name);
-            //         setCropVisible(true);
-            //     })
-            //     .finally(() => setLoading(false))
-            //     .catch(error => console.log('error', error));
+           
+           setLoading('predict')
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
 
@@ -258,6 +232,7 @@ const CropRecommender = ({ navigation }) => {
                     // alert()
                     setPredictedCrop(result.prediction);
                     setCropVisible(true);
+                    setLoading(false)
                 })
                 .catch(error => console.log('error', error));
 
@@ -387,7 +362,7 @@ const CropRecommender = ({ navigation }) => {
 
                         <TouchableOpacity disabled={(loading === 'toWeather')} onPress={callMlModel} style={styles.button}>
                             {
-                                loading === 'toWeather' ?
+                                loading === 'predict' ?
                                     <ActivityIndicator size="large" color="#f8f9fc" />
                                     :
                                     <><Text style={{ fontSize: 23, color: '#f8f9fc', fontWeight: 'bold' }}>Next</Text>
@@ -443,7 +418,7 @@ const CropRecommender = ({ navigation }) => {
                                     <Text style={styles.overlayText}>Fetch Weather Data by Location ?</Text>
 
                                     <View style={styles.buttonContainer}>
-                                        <TouchableOpacity onPress={fetchLocation} style={[styles.overlayBtn, { backgroundColor: '#2b5c4c', borderColor: '#023020' }]}>
+                                        <TouchableOpacity onPress={getWeatherData} style={[styles.overlayBtn, { backgroundColor: '#2b5c4c', borderColor: '#023020' }]}>
                                             <Text style={[styles.overlayBtnText, { color: '#fff' }]}>Yes</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={() => { setFormProgress('weather'); setVisible(false) }} style={[styles.overlayBtn, { borderColor: '#2b5c4c' }]}>

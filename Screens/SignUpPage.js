@@ -31,7 +31,7 @@ const SignUpPage = ({ navigation }) => {
   const saveDataToStorage = (loginStatus, accessToken) => {
     AsyncStorage.setItem(
       "userData",
-      JSON.stringify({ Status: loginStatus, accessToken: accessToken })
+      JSON.stringify({ Status: loginStatus, name: accessToken })
     );
   };
   const SubmitSignUp = () => {
@@ -121,7 +121,7 @@ const SignUpPage = ({ navigation }) => {
               icon: "success",
               duration: 3500,
             });
-            saveDataToStorage("name", result.user.name)
+            saveDataToStorage("success", result.user.name)
             login()
           }
         })

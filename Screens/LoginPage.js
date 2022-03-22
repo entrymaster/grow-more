@@ -28,7 +28,7 @@ const LoginPage = ({ navigation }) => {
   const saveDataToStorage = (loginStatus, accessToken) => {
     AsyncStorage.setItem(
       "userData",
-      JSON.stringify({ Status: loginStatus, accessToken: accessToken })
+      JSON.stringify({ Status: loginStatus, name: accessToken })
     );
   };
   const SubmitLogin = () => {

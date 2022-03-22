@@ -22,7 +22,7 @@ const Dashboard = () => {
     };
     const LogOutPressed = () => {
         Alert.alert(
-            'Logout Suparider',
+            'Logout Grow More',
             'Are you sure you want to logout ? ',
             [
                 { text: 'OK', onPress: () => { handleLogout() } },
