@@ -106,11 +106,11 @@ export const TabNavigation = (props) => {
             }}>
             <TimesBottomTab.Screen name="News" component={News} options={{ title: 'Farming News', headerStyle:{backgroundColor:'#2b5c4c' },
             headerTitleStyle:{color:'#fff'} }} />
-            <TimesBottomTab.Screen name="CropList" component={CropList} options={{ title: 'Crop List' }} />
+            <TimesBottomTab.Screen name="CropList" component={CropList} options={{ title: 'Crop List',headerStyle:{backgroundColor:'#2b5c4c' },headerTitleStyle:{color:'#fff'} }} />
             <TimesBottomTab.Screen name="Recommender" component={CropRecommender} options={{ title: 'Recommender',headerStyle:{backgroundColor:'#2b5c4c' },
             headerTitleStyle:{color:'#fff'} }} />
-            <TimesBottomTab.Screen name="History" component={History} options={{ title: 'History', }} />
-            <TimesBottomTab.Screen name="Dashboard" component={Dashboard} options={{ title: 'Dashboard', }} />
+            <TimesBottomTab.Screen name="History" component={History} options={{ title: 'History',headerStyle:{backgroundColor:'#2b5c4c' },headerTitleStyle:{color:'#fff'} }} />
+            <TimesBottomTab.Screen name="Dashboard" component={Dashboard} options={{ title: 'Dashboard',headerStyle:{backgroundColor:'#2b5c4c' },headerTitleStyle:{color:'#fff'} }} />
         </TimesBottomTab.Navigator>
 
     );

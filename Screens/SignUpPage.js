@@ -18,74 +18,114 @@ import { showMessage } from "react-native-flash-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignUpPage = ({ navigation }) => {
-    
-    const [name, setName] = useState("");
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [email, setEmail] = useState("")
-    const [passHidden, setPassHidden] = useState(true);
-    const [loading, setLoading] = useState();
-    const { login } = React.useContext(AuthContext);
-    const { skip } = React.useContext(AuthContext);
 
-//   const saveDataToStorage = (loginStatus, candidateId) => {
-//     AsyncStorage.setItem(
-//       "userData",
-//       JSON.stringify({ Status: loginStatus, candidateId: candidateId })
-//     );
-//   };
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("")
+  const [passHidden, setPassHidden] = useState(true);
+  const [loading, setLoading] = useState();
+  const { login } = React.useContext(AuthContext);
+  const { skip } = React.useContext(AuthContext);
+
+  const saveDataToStorage = (loginStatus, accessToken) => {
+    AsyncStorage.setItem(
+      "userData",
+      JSON.stringify({ Status: loginStatus, accessToken: accessToken })
+    );
+  };
   const SubmitSignUp = () => {
-    if (!username) {
-        showMessage({
-          message: "Please fill username !",
-          type: "warning",
-          icon: "warning",
-          duration: 3500,
-        });
-      }else if (!password) {
-        showMessage({
-          message: "Please fill password !",
-          type: "warning",
-          icon: "warning",
-          duration: 3500,
-        });
-      } else {
-          setLoading(true)
-    fetch(global.baseURL + "users/register", {
-      method: "POST",
-      timeout: 10000,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: username,
-        name: name,
-        email:"rajat@gmail.com",
-        token:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvbnN0YXJrIiwiaWF0IjoxNjM4MTI5MDY0fQ.TjTX5RMII5buB8KLqDycXNI3byWelLPpFQGjJilw0J8",
-        password: password,
-      }),
-    })
-      .then((response) => response.json())
-      // .then((json) => console.log(json))
-      .then((result) => {
-        console.log(result);
-        if(result.message === "New user added successfully"){
+    if (!name) {
+      showMessage({
+        message: "Please fill name !",
+        type: "warning",
+        icon: "warning",
+        duration: 3500,
+      });
+    } else if (!email) {
+      showMessage({
+        message: "Please fill email !",
+        type: "warning",
+        icon: "warning",
+        duration: 3500,
+      });
+    } else if (!password) {
+      showMessage({
+        message: "Please fill password !",
+        type: "warning",
+        icon: "warning",
+        duration: 3500,
+      });
+    } else {
+      setLoading(true)
+      // var myHeaders = new Headers();
+      // myHeaders.append("Content-Type", "application/json");
+
+      // var raw = JSON.stringify({
+      //   name: (name),
+      //   email: (email),
+      //   password: (password)
+      // });
+
+      // var requestOptions = {
+      //   method: 'POST',
+      //   headers: myHeaders,
+      //   body: raw,
+      //   // redirect: 'follow'
+      // };
+
+      // fetch(global.baseURL+"v1/auth/register", requestOptions)
+      //   .then(response => response.json())
+      //   .then(result => {
+      //     console.log(result);
+      //     showMessage({
+      //       message: "Signed Up Successfully !",
+      //       type: "success",
+      //       icon: "success",
+      //       duration: 3500,
+      //   });
+      //     saveDataToStorage("success", result.tokens.access.token)
+      //     login()
+      //   })
+      //   .finally(() => setLoading(false))
+      //   .catch(error => console.log('error', error));
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      var raw = JSON.stringify({
+        "name": (name),
+        "email": (email),
+        "password": (password)
+      });
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+      };
+
+      fetch("https://grow-more-backend.herokuapp.com/v1/auth/register", requestOptions)
+        .then(response => {
+          if (!response.ok) {
+            alert("Something went wrong");
+          }
+          return response.json()
+        })
+        .then(result => {
+          console.log(result);
+          if (result.user !== undefined) {
             showMessage({
-                message: "Signed Up Successfully !",
-                type: "success",
-                icon: "success",
-                duration: 3500,
+              message: "Signed Up Successfully !",
+              type: "success",
+              icon: "success",
+              duration: 3500,
             });
-            navigation.navigate("LoginPage")
-            // alert('hi')
-          // if (result.status_code === 200 && result.status === "SUCCESS") {
-          // }
-        }
-      })
-      // .finally(() => setLoading(false))
-      .catch((error) => console.log(error));
+            saveDataToStorage("name", result.user.name)
+            login()
+          }
+        })
+        .catch(error => console.log('error', error));
     }
   };
 
@@ -93,97 +133,97 @@ const SignUpPage = ({ navigation }) => {
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <LinearGradient style={{ flex: 1 }} colors={["#91EAE4", "#2b5c4c"]}>
-        <ScrollView
-          keyboardShouldPersistTaps="handled" 
-          showsVerticalScrollIndicator={false}>
-          <KeyboardAvoidingView behavior={"position"}>
-            <View>
-             
-              <Image
-                style={styles.logoImg}
-                source={require("../assets/logo.png")}
-              />
-             
-              <View style={styles.fieldContainer}>
-                <Text style={styles.headingText}>Sign Up</Text>
-                <View style={styles.horizontalLine} />
-                <Text style={styles.inputBoxLabel}>your name</Text>
-                <TextInput
-                  selectionColor="#FFFFFF"
-                  style={styles.inputBox}
-                  onChangeText={(text) => setName(text)}
-                  value={name}
-                  autoCapitalize="none"
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}>
+            <KeyboardAvoidingView behavior={"position"}>
+              <View>
+
+                <Image
+                  style={styles.logoImg}
+                  source={require("../assets/logo.png")}
                 />
-                <Text style={styles.inputBoxLabel}>create username</Text>
+
+                <View style={styles.fieldContainer}>
+                  <Text style={styles.headingText}>Sign Up</Text>
+                  <View style={styles.horizontalLine} />
+                  <Text style={styles.inputBoxLabel}>your name</Text>
+                  <TextInput
+                    selectionColor="#FFFFFF"
+                    style={styles.inputBox}
+                    onChangeText={(text) => setName(text)}
+                    value={name}
+                    autoCapitalize="none"
+                  />
+                  {/* <Text style={styles.inputBoxLabel}>create username</Text>
                 <TextInput
                   selectionColor="#FFFFFF"
                   style={styles.inputBox}
                   onChangeText={(text) => setUsername(text)}
                   value={username}
                   autoCapitalize="none"
-                />
-                <Text style={styles.inputBoxLabel}>your email</Text>
-                <TextInput
-                  selectionColor="#FFFFFF"
-                  style={styles.inputBox}
-                  onChangeText={(text) => setEmail(text)}
-                  value={email}
-                  autoCapitalize="none"
-                />
-                <Text style={styles.inputBoxLabel}>Password</Text>
-                <View>
-                <View style={{flexDirection:'row',marginRight:25}}>
+                /> */}
+                  <Text style={styles.inputBoxLabel}>your email</Text>
                   <TextInput
                     selectionColor="#FFFFFF"
-                    secureTextEntry={passHidden}
                     style={styles.inputBox}
-                    onChangeText={(text) => setPassword(text)}
-                    value={password}
+                    onChangeText={(text) => setEmail(text)}
+                    value={email}
                     autoCapitalize="none"
                   />
-                  <TouchableOpacity
-                    activeOpacity={1}
-                    style={styles.eyeIcon}
-                    onPress={() => setPassHidden(!passHidden)}
-                  >
-                    <Ionicons
-                      name={
-                        passHidden ? "ios-eye-off-outline" : "ios-eye-outline"
-                      }
-                      size={25}
-                      color="white"
-                    />
-                  </TouchableOpacity>
-                  </View>
-                  {/* <TouchableOpacity>
+                  <Text style={styles.inputBoxLabel}>Password</Text>
+                  <View>
+                    <View style={{ flexDirection: 'row', marginRight: 25 }}>
+                      <TextInput
+                        selectionColor="#FFFFFF"
+                        secureTextEntry={passHidden}
+                        style={styles.inputBox}
+                        onChangeText={(text) => setPassword(text)}
+                        value={password}
+                        autoCapitalize="none"
+                      />
+                      <TouchableOpacity
+                        activeOpacity={1}
+                        style={styles.eyeIcon}
+                        onPress={() => setPassHidden(!passHidden)}
+                      >
+                        <Ionicons
+                          name={
+                            passHidden ? "ios-eye-off-outline" : "ios-eye-outline"
+                          }
+                          size={25}
+                          color="white"
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    {/* <TouchableOpacity>
                     <Text style={styles.forgotText}>Forgot Password?</Text>
                   </TouchableOpacity> */}
+                  </View>
+                  <TouchableOpacity
+                    activeOpacity={1}
+                    style={styles.signupBtn}
+                    onPress={() => SubmitSignUp()}
+                  >
+                    {loading ? (
+                      <ActivityIndicator color={"#F02F39"} />
+                    ) : (
+                      <Text style={styles.loginBtnText}>Sign Up</Text>
+                    )}
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                  activeOpacity={1}
-                  style={styles.signupBtn}
-                  onPress={() => SubmitSignUp()}
-                >
-                  {loading ? (
-                    <ActivityIndicator color={"#F02F39"} />
-                  ) : (
-                    <Text style={styles.loginBtnText}>Sign Up</Text>
-                  )}
-                </TouchableOpacity>
-              </View>
 
-            </View>
-          </KeyboardAvoidingView>
+              </View>
+            </KeyboardAvoidingView>
           </ScrollView>
           <View style={styles.bottomTextView}>
-              <Text style={styles.bottomText}>Already have an account? </Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("LoginPage")}
-              >
-                <Text style={styles.signupText}>LOG IN</Text>
-              </TouchableOpacity>
-            </View>
+            <Text style={styles.bottomText}>Already have an account? </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("LoginPage")}
+            >
+              <Text style={styles.signupText}>LOG IN</Text>
+            </TouchableOpacity>
+          </View>
         </LinearGradient>
       </TouchableWithoutFeedback>
     </View>
@@ -204,7 +244,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
   },
-  
+
   logoImg: {
     height: 200,
     // flex:1,
@@ -216,7 +256,7 @@ const styles = StyleSheet.create({
   fieldContainer: {
     // marginTop: 20,
     marginBottom: 20,
-    height:'65%',
+    height: '65%',
     paddingHorizontal: 30,
   },
   headingText: {
@@ -247,10 +287,10 @@ const styles = StyleSheet.create({
     marginTop: 25,
   },
   eyeIcon: {
-      borderBottomWidth:1,
-      padding:1,
+    borderBottomWidth: 1,
+    padding: 1,
     //   marginRight:10,
-      borderBottomColor:'#fff'
+    borderBottomColor: '#fff'
     // position: "absolute",
     // right: 5,top: 0, left: 0, right: 0, bottom: 0,
   },
@@ -261,7 +301,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   signupBtn: {
-      marginTop:40,
+    marginTop: 40,
     alignSelf: "center",
     borderRadius: 30,
     backgroundColor: "#F3F3F3",
@@ -279,7 +319,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   bottomTextView: {
-    marginBottom:20,
+    marginBottom: 20,
     flexDirection: "row",
     alignSelf: "center",
   },

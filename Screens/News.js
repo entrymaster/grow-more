@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Image, Text, View, FlatList } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const DateFormatter = (value) => {
     let date = value.split('T')[0].split('-');
@@ -37,6 +38,13 @@ const DateFormatter = (value) => {
 
 
 const News = () => {
+
+    AsyncStorage.getItem("userData").then((value) => {
+        let parseData = JSON.parse(value);
+        console.log(parseData);
+  
+       
+      });
 
     const [news, setNews] = useState('');
 

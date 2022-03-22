@@ -25,10 +25,10 @@ const LoginPage = ({ navigation }) => {
   const { login } = React.useContext(AuthContext);
   const { skip } = React.useContext(AuthContext);
 
-  const saveDataToStorage = (loginStatus) => {
+  const saveDataToStorage = (loginStatus, accessToken) => {
     AsyncStorage.setItem(
       "userData",
-      JSON.stringify({ Status: loginStatus, userName: loginID })
+      JSON.stringify({ Status: loginStatus, accessToken: accessToken })
     );
   };
   const SubmitLogin = () => {
@@ -47,16 +47,48 @@ const LoginPage = ({ navigation }) => {
         duration: 3500,
       });
     } else {
-      saveDataToStorage("success");
-      login();
-      setLoading(true)
+      // saveDataToStorage("success", 'BBUn')
+      //         login()
+      // setLoading(true)
+      //   var myHeaders = new Headers();
+      //       myHeaders.append("Content-Type", "application/json");
+
+      //       var raw = JSON.stringify({
+      //         email: loginID,
+      //         password: password
+      //       });
+
+      //       var requestOptions = {
+      //         method: 'POST',
+      //         headers: myHeaders,
+      //         body: raw,
+      //         redirect: 'follow'
+      //       };
+
+      //       fetch(global.baseURL+"v1/auth/login", requestOptions)
+      //         .then(response => response.json())
+      //         .then(result => {
+      //          console.log(result);
+      //           showMessage({
+      //             message: "Logged In Successfully !",
+      //             type: "success",
+      //             icon: "success",
+      //             duration: 3500,
+      //         });
+
+      //           saveDataToStorage("success", result.tokens.access.token)
+      //           console.log(result.tokens.access.token);
+      //           login()
+      //         })
+      //         .finally(() => setLoading(false))
+      //         .catch(error => console.log('error', error));
+      // }
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MWNjOGVlMzY3NmI5OGNmYmY2OTcyZjUiLCJ0eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQwODEwNTAzLCJpYXQiOjE2NDA3OTYxMDN9.8nhDLrATTnEkNbiL8kGrbUemooeUyjCnzsFKszA1Tew");
 
       var raw = JSON.stringify({
-        "email": "faisal@gmail.com",
-        "password": "faisal@21"
+        "email": loginID,
+        "password": password
       });
 
       var requestOptions = {
@@ -66,21 +98,25 @@ const LoginPage = ({ navigation }) => {
         redirect: 'follow'
       };
 
-      fetch( global.baseURL +"v1/auth/login", requestOptions)
-        .then(response => response.json())
+      fetch("https://grow-more-backend.herokuapp.com/v1/auth/login", requestOptions)
+        .then(response => {
+          if (!response.ok) {
+            alert("User Not Found");
+          }
+            return response.json()
+        })
         .then(result => {
-          if (result.message === "Login successful") {
+          if (result.user !== undefined) {
             showMessage({
-              message: "Login Successful!",
+              message: "Logged In Successfully !",
               type: "success",
               icon: "success",
               duration: 3500,
             });
-            saveDataToStorage("success");
-            login();
-            // alert('hi')
-            // if (result.status_code === 200 && result.status === "SUCCESS") {
-            // }
+
+            saveDataToStorage("name", result.user.name)
+            // console.log(result.tokens.access.token);
+            login()
           }
         })
         .catch(error => console.log('error', error));
@@ -106,12 +142,13 @@ const LoginPage = ({ navigation }) => {
               <View style={styles.fieldContainer}>
                 <Text style={styles.headingText}>Login</Text>
                 <View style={styles.horizontalLine} />
-                <Text style={styles.inputBoxLabel}>Username</Text>
+                <Text style={styles.inputBoxLabel}>Email</Text>
                 <TextInput
                   selectionColor="#FFFFFF"
                   style={styles.inputBox}
                   onChangeText={(text) => setLoginID(text)}
                   value={loginID}
+                  keyboardAppearance={'dark'}
                   autoCapitalize="none"
                 />
                 <Text style={styles.inputBoxLabel}>Password</Text>

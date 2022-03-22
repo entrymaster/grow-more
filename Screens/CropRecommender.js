@@ -1,7 +1,4 @@
-// import React,{useState, useEffect} from 'react'
-// import { StyleSheet, Text, View } from 'react-native'
-import FetchLocation from '../Components/FetchLocation'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from 'react-native'
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -10,6 +7,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Overlay } from "react-native-elements";
 import { showMessage } from "react-native-flash-message";
+import * as Location from 'expo-location';
+import SuccessOverlay from '../Components/SuccessOverlay';
+
 
 const CropRecommender = ({ navigation }) => {
 
@@ -18,41 +18,250 @@ const CropRecommender = ({ navigation }) => {
 
     const [userLocation, setUserLocation] = useState();
     const [autoWeatherFetch, setAutoWeatherFetch] = useState(false);
-    const [weatherData, setWeatherData] = useState();
+    const [weatherData, setWeatherData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [visible, setVisible] = useState(false);
+    const [formProgress, setFormProgress] = useState('soil');
+    const [cropVisible, setCropVisible] = useState(false)
+    const [accessToken, setAccessToken] = useState('')
+
+    //data states
     const [nitrogen, setNitrogen] = useState('');
     const [phosphorus, setPhosphorus] = useState('');
     const [potassium, setPotassium] = useState('');
     const [pH, setpH] = useState('');
-    const [formProgress, setFormProgress] = useState('soil');
+    const [temperature, setTemperature] = useState('');
+    const [rainfall, setRainfall] = useState('');
+    const [humidity, setHumidity] = useState('');
+    const [predictedCrop, setPredictedCrop] = useState(null);
 
 
+    // useEffect(() => {
+    //    if(cropVisible !== null)
+    //    {
+
+    //    }
+    // }, [predictedCrop])
+
+    // useEffect(() => {
+
+    //     AsyncStorage.getItem("userData").then((value) => {
+    //         let parseData = JSON.parse(value);
+    //         setAccessToken(parseData.accessToken);
+
+
+    //     });
+    // }, []);
 
     useEffect(() => {
-        // console.log(userLocation.latitude);
-        getWeatherData()
-    }, [userLocation]);
+        if (weatherData !== null) {
+            setHumidity(Math.round(weatherData.humidity.mean))
+            setTemperature(Math.round(weatherData.temp.mean - 273.15))
+            setRainfall(Math.round(weatherData.precipitation.mean * 8640))
+        }
+
+    }, [weatherData])
 
     const getWeatherData = async () => {
         const requestURL = BASE_WEATHER_URL + "month=12&lat=" + userLocation.latitude + "&lon=" + userLocation.longitude + "&appid=" + WEATHER_API_KEY;
+
         await fetch(requestURL)
             .then(res => res.json())
             .then(result => {
-                if (result.cod === "200") {
+                if (result.cod === 200) {
                     setWeatherData(result.result);
+                    setVisible(false);
+                    setLoading(false);
+                    setFormProgress('weather');
                 }
             });
     }
 
     const submit = () => {
-        setLoading('toWeather');
+        if (!nitrogen) {
+            showMessage({
+                message: "Please enter nitrogen value !",
+                type: "warning",
+                icon: "warning",
+                duration: 3500,
+            });
+        } else if (!phosphorus) {
+            showMessage({
+                message: "Please enter phosphorus value !",
+                type: "warning",
+                icon: "warning",
+                duration: 3500,
+            });
+        } else if (!potassium) {
+            showMessage({
+                message: "Please enter potassium value !",
+                type: "warning",
+                icon: "warning",
+                duration: 3500,
+            });
+        } else if (!pH) {
+            showMessage({
+                message: "Please enter pH value !",
+                type: "warning",
+                icon: "warning",
+                duration: 3500,
+            });
+        } else {
+            setLoading('toWeather');
+            setTimeout(() => {
+                setLoading(false);
+                // setFormProgress('weather')
+                setVisible(true);
+                // navigation.navigate('WeatherFetch')
+            }, 500);
+        }
+
+    }
+
+    // const AutoWeatherFetch = () =>{
+    //     setLoading('weatherFetching');
+    //     setAutoWeatherFetch(true);
+    // }
+
+    const fetchLocation = async () => {
+        setLoading('weatherFetching');
+        if (Platform.OS === 'android' && !Constants.isDevice) {
+            setErrorMsg(
+                'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
+            );
+            return;
+        }
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            setErrorMsg('Permission to access location was denied');
+            return;
+        }
+
+        let location = await Location.getCurrentPositionAsync({});
+        // setLocation(location);
+        setUserLocation(location.coords);
         setTimeout(() => {
-            setLoading(false);
-            // setFormProgress('weather')
-              setVisible(true);
-            // navigation.navigate('WeatherFetch')
-        }, 1000);
+            if (userLocation) {
+                getWeatherData()
+            }
+
+        }, 200);
+    }
+
+    const goBack = () => {
+        setFormProgress('soil')
+    }
+
+    const callMlModel = () => {
+        if (!nitrogen) {
+            showMessage({
+                message: "Nitrogen Value missing !",
+                type: "warning",
+                icon: "warning",
+                duration: 3500,
+            });
+        }
+        else if (!phosphorus) {
+            showMessage({
+                message: "Phosphorus Value missing !",
+                type: "warning",
+                icon: "warning",
+                duration: 3500,
+            });
+        } else if (!potassium) {
+            showMessage({
+                message: "Potassium Value missing !",
+                type: "warning",
+                icon: "warning",
+                duration: 3500,
+            });
+        } else if (!pH) {
+            showMessage({
+                message: "pH Value missing !",
+                type: "warning",
+                icon: "warning",
+                duration: 3500,
+            });
+        } else if (!temperature) {
+            showMessage({
+                message: "Temperature Value missing !",
+                type: "warning",
+                icon: "warning",
+                duration: 3500,
+            });
+        } else if (!humidity) {
+            showMessage({
+                message: "Humidity Value missing !",
+                type: "warning",
+                icon: "warning",
+                duration: 3500,
+            });
+        } else if (!rainfall) {
+            showMessage({
+                message: "Rainfall Value missing !",
+                type: "warning",
+                icon: "warning",
+                duration: 3500,
+            });
+        } else {
+            // console.log(accessToken);
+            // setLoading('finalSubmit')
+            // var myHeaders = new Headers();
+            // myHeaders.append("Content-Type", "application/json");
+            // myHeaders.append("Authorization", 'Bearer '+accessToken);
+
+            // var raw = JSON.stringify({
+            //     arr: [
+            //         (nitrogen),
+            //         (phosphorus),
+            //         (potassium),
+            //         (temperature.toString()),
+            //         (humidity.toString()),
+            //         (pH),
+            //         (rainfall.toString())
+            //     ]
+            // });
+
+            // var requestOptions = {
+            //     method: 'POST',
+            //     headers: myHeaders,
+            //     body: raw,
+            //     // redirect: 'follow'
+            // };
+            // console.log(raw);
+            // fetch(global.baseURL + "v1/model", requestOptions)
+            //     .then(response => response.json())
+            //     .then(result => {
+            //         console.log(result);
+            //         setPredictedCrop(result.crop_name);
+            //         setCropVisible(true);
+            //     })
+            //     .finally(() => setLoading(false))
+            //     .catch(error => console.log('error', error));
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            var raw = JSON.stringify({
+                "values": `${nitrogen}`+" "+`${phosphorus}`+" "+`${potassium}`+" "+`${temperature.toString()}`+" "+`${humidity.toString()}`+" "+`${pH}`+" "+`${rainfall.toString()}`
+            });
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'
+            };
+
+            fetch("https://crop-predictor-model.herokuapp.com/predict", requestOptions)
+                .then(response => response.json())
+                .then(result => {
+                    // alert()
+                    setPredictedCrop(result.prediction);
+                    setCropVisible(true);
+                })
+                .catch(error => console.log('error', error));
+
+        }
 
     }
 
@@ -121,7 +330,75 @@ const CropRecommender = ({ navigation }) => {
 
                 </ScrollView>
             case 'weather':
-                return <Text>Hello</Text>
+                return <ScrollView>
+                    <Text style={{
+                        color: '#36454f',
+                        fontSize: 28,
+                        paddingTop: 20,
+                        paddingLeft: 15
+                    }}>Enter Weather Parameters</Text>
+                    <Text style={styles.headingDesc}>मौसम के मापदंड दर्ज करें ...</Text>
+                    <View style={styles.fieldContainer}>
+                        <Text style={styles.label}>Average Rainfall (cm) (औसत वर्षा):</Text>
+                        <TextInput
+                            style={styles.input}
+                            editable={!(loading === 'toWeather')}
+                            onChangeText={(text) => setRainfall(text)}
+                            value={rainfall}
+                            defaultValue={`${rainfall}`}
+                            placeholder="Enter average Rainfall"
+                            autoCapitalize="none"
+                            keyboardType="numeric"
+                        />
+
+                        <Text style={styles.label}>Average Temperature °C (औसत तापमान):</Text>
+                        <TextInput
+                            style={styles.input}
+                            editable={!(loading === 'toWeather')}
+                            defaultValue={`${temperature}`}
+                            onChangeText={(text) => setTemperature(text)}
+                            value={temperature}
+                            placeholder="Enter average Temperature"
+                            autoCapitalize="none"
+                            keyboardType="numeric"
+                        />
+
+                        <Text style={styles.label}>Average Humidity (%) (औसत आर्द्रता):</Text>
+                        <TextInput
+                            style={styles.input}
+                            editable={!(loading === 'toWeather')}
+                            onChangeText={(text) => setHumidity(text)}
+                            defaultValue={`${humidity}`}
+                            value={humidity}
+                            placeholder="Enter average Humidity"
+                            autoCapitalize="none"
+                            keyboardType="numeric"
+                        />
+
+
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+                        <TouchableOpacity onPress={goBack} style={styles.button}>
+                            <FontAwesome5 name="chevron-circle-left" size={24} color="#f8f9fc" />
+                            <Text style={{ fontSize: 23, color: '#f8f9fc', fontWeight: 'bold' }}>Back</Text>
+
+
+                        </TouchableOpacity>
+
+                        <TouchableOpacity disabled={(loading === 'toWeather')} onPress={callMlModel} style={styles.button}>
+                            {
+                                loading === 'toWeather' ?
+                                    <ActivityIndicator size="large" color="#f8f9fc" />
+                                    :
+                                    <><Text style={{ fontSize: 23, color: '#f8f9fc', fontWeight: 'bold' }}>Next</Text>
+                                        <FontAwesome5 name="chevron-circle-right" size={24} color="#f8f9fc" /></>
+                            }
+                        </TouchableOpacity>
+
+                    </View>
+
+                </ScrollView>
+
             default:
                 break;
         }
@@ -133,12 +410,15 @@ const CropRecommender = ({ navigation }) => {
 
         // </View>
         <View style={styles.container}>
+            {/* {autoWeatherFetch && <FetchLocation setUserLocation={setUserLocation} />} */}
             <LinearGradient style={{ flex: 1, justifyContent: 'space-around' }} colors={["#f5f7fa", "#c3cfe2"]}>
 
 
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     {
-                        DisplaySwitch()
+                        loading === 'finalSubmit' ?
+                            <ActivityIndicator style={{ flex: 1 }} size="large" color="#2b5c4c" />
+                            : DisplaySwitch()
                     }
                 </TouchableWithoutFeedback>
 
@@ -149,28 +429,35 @@ const CropRecommender = ({ navigation }) => {
                     overlayStyle={styles.overlay}
                 >
                     <View style={styles.overlayContainer}>
-                        <View
-                            style={{
-                                borderTopWidth: 1,
-                                borderBottomWidth: 1,
-                                borderColor: '#6c7075',
-                            }}
-                        >
-                        <Text style={styles.overlayText}>Fetch Weather Data by Location ?</Text>
+                        {
+                            loading === 'weatherFetching' ?
+                                <ActivityIndicator style={{ flex: 1 }} size="large" color="#2b5c4c" />
+                                :
+                                <View
+                                    style={{
+                                        borderTopWidth: 1,
+                                        borderBottomWidth: 1,
+                                        borderColor: '#6c7075',
+                                    }}
+                                >
+                                    <Text style={styles.overlayText}>Fetch Weather Data by Location ?</Text>
 
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity>
-                                <Text>Yes</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity>
-                                <Text>No</Text>
-                            </TouchableOpacity>
-                        </View>
+                                    <View style={styles.buttonContainer}>
+                                        <TouchableOpacity onPress={fetchLocation} style={[styles.overlayBtn, { backgroundColor: '#2b5c4c', borderColor: '#023020' }]}>
+                                            <Text style={[styles.overlayBtnText, { color: '#fff' }]}>Yes</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={() => { setFormProgress('weather'); setVisible(false) }} style={[styles.overlayBtn, { borderColor: '#2b5c4c' }]}>
+                                            <Text style={[styles.overlayBtnText, { color: '#2b5c4c' }]}>No</Text>
+                                        </TouchableOpacity>
+                                    </View>
 
-                        </View>
+                                </View>
+                        }
+
                     </View>
                 </Overlay>
             </LinearGradient>
+            <SuccessOverlay cropVisible={cropVisible} setCropVisible={setCropVisible} crop={predictedCrop} />
         </View>
     )
 }
@@ -239,13 +526,14 @@ const styles = StyleSheet.create({
     },
     overlayContainer: {
         width: 250,
+        height: 170
 
     },
     overlayText: {
         paddingVertical: 10,
         fontSize: 20,
         color: "#2b5c4c",
-        fontWeight:'bold'
+        fontWeight: 'bold'
     },
     button: {
         backgroundColor: '#2b5c4c',
@@ -258,7 +546,23 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-evenly'
     },
-    buttonContainer:{
-        
+    buttonContainer: {
+        flexDirection: 'row',
+        width: '100%',
+        justifyContent: 'space-evenly'
+    },
+    overlayBtn: {
+        alignSelf: 'center',
+        padding: 10,
+        marginVertical: 20,
+        borderRadius: 12,
+        // flexDirection: 'row',
+        width: 100,
+        borderWidth: 2,
+        alignItems: 'center',
+    },
+    overlayBtnText: {
+        fontSize: 18,
+
     }
 })

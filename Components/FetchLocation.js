@@ -7,9 +7,9 @@ const FetchLocation =(props)=> {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   
-  useEffect(() => {
-   props.setUserLocation(location.coords);
-  }, [location])
+  // useEffect(() => {
+   
+  // }, [location])
 
   useEffect(() => {
     (async () => {
@@ -26,7 +26,8 @@ const FetchLocation =(props)=> {
       }
 
       let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
+      // setLocation(location);
+      props.setUserLocation(location.coords);
     })();
   }, []);
 
@@ -39,8 +40,8 @@ const FetchLocation =(props)=> {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.paragraph}>{text}</Text>
-      <Text style={styles.paragraph}>Hu</Text>
+      {/* <Text style={styles.paragraph}>{text}</Text>
+      <Text style={styles.paragraph}>Hu</Text> */}
     </View>
   );
 }
@@ -49,10 +50,10 @@ export default FetchLocation
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+    // flex: 1,
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    // padding: 20,
   },
   paragraph: {
     fontSize: 18,
