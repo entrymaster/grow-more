@@ -67,8 +67,8 @@ const AboutInfo = (props) => {
       option: "Farm 4",
     },
   ];
-  let name = "Deepak Singh";
-  let category = "Lucknow, U.P ";
+  let name = "Srividya";
+  let category = "Vijaywada, A.P";
 
   const username = (name) => {
     var str = name;
