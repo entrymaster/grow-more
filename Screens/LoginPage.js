@@ -47,42 +47,6 @@ const LoginPage = ({ navigation }) => {
         duration: 3500,
       });
     } else {
-      // saveDataToStorage("success", 'BBUn')
-      //         login()
-      // setLoading(true)
-      //   var myHeaders = new Headers();
-      //       myHeaders.append("Content-Type", "application/json");
-
-      //       var raw = JSON.stringify({
-      //         email: loginID,
-      //         password: password
-      //       });
-
-      //       var requestOptions = {
-      //         method: 'POST',
-      //         headers: myHeaders,
-      //         body: raw,
-      //         redirect: 'follow'
-      //       };
-
-      //       fetch(global.baseURL+"v1/auth/login", requestOptions)
-      //         .then(response => response.json())
-      //         .then(result => {
-      //          console.log(result);
-      //           showMessage({
-      //             message: "Logged In Successfully !",
-      //             type: "success",
-      //             icon: "success",
-      //             duration: 3500,
-      //         });
-
-      //           saveDataToStorage("success", result.tokens.access.token)
-      //           console.log(result.tokens.access.token);
-      //           login()
-      //         })
-      //         .finally(() => setLoading(false))
-      //         .catch(error => console.log('error', error));
-      // }
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
@@ -90,6 +54,7 @@ const LoginPage = ({ navigation }) => {
         "email": loginID,
         "password": password
       });
+      console.log(raw)
 
       var requestOptions = {
         method: 'POST',
@@ -99,13 +64,8 @@ const LoginPage = ({ navigation }) => {
       };
 
       fetch("https://grow-more-backend.herokuapp.com/v1/auth/login", requestOptions)
-        .then(response => {
-          if (!response.ok) {
-            alert("User Not Found");
-          }
-            return response.json()
-        })
-        .then(result => {
+      .then((response) => response.json())
+      .then((result) => {
           if (result.user !== undefined) {
             showMessage({
               message: "Logged In Successfully !",
@@ -113,9 +73,7 @@ const LoginPage = ({ navigation }) => {
               icon: "success",
               duration: 3500,
             });
-
             saveDataToStorage("name", result.user.name)
-            // console.log(result.tokens.access.token);
             login()
           }
         })

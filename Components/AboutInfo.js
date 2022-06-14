@@ -154,7 +154,7 @@ Harvested and reaped vegetables, fruits and crops using farm equipment or hand.
 Repaired and replaced defective farm equipment.
         </Text>
         <Divider />
-        <FlatList
+        {/* <FlatList
           data={DropDownOptions}
           keyExtractor={(item) => item.keyIndex}
           renderItem={({ item }) => (
@@ -187,8 +187,7 @@ Repaired and replaced defective farm equipment.
                 <FlatList
                   data={randomData}
                   style={{
-                    // flexDirection: "row",
-                    // flexWrap: "wrap",
+                  
                     paddingHorizontal: 10,
                   }}
                   keyExtractor={(item) => item.id}
@@ -218,12 +217,9 @@ Repaired and replaced defective farm equipment.
                       <View>
                         <Text style={{ color: "#F02F39", fontWeight: 'bold' }}>{item.position}</Text>
                         <Text style={{ color: "#707070", fontWeight: 'bold' }}>{item.employer}</Text>
-                        {/* <View style={{flexDirection:'row'}}> */}
+                       
                           <Text style={{color: "#707070"}}>{DifferenceBetweenDates(item.from, item.to)}</Text>
-                          {/* <Text style={{ color: "#707070" }}>
-                            {" ( "+item.from + " - " + item.to+" )"}
-                          </Text> */}
-                        {/* </View> */}
+                        
                       </View>
                       <TouchableOpacity
                         style={{ paddingLeft: 5 }}
@@ -236,7 +232,7 @@ Repaired and replaced defective farm equipment.
               ) : null}
             </View>
           )}
-        />
+        /> */}
 
         <Divider />
         <Text style={styles.showMore}>Show More </Text>

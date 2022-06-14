@@ -57,7 +57,7 @@ const SignUpPage = ({ navigation }) => {
         duration: 3500,
       });
     } else {
-      setLoading(true)
+      // setLoading(true)
       // var myHeaders = new Headers();
       // myHeaders.append("Content-Type", "application/json");
 
@@ -110,7 +110,7 @@ const SignUpPage = ({ navigation }) => {
           if (!response.ok) {
             alert("Something went wrong");
           }
-          return response.json()
+          return response.text()
         })
         .then(result => {
           console.log(result);
