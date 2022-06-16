@@ -48,7 +48,8 @@ const CropRecommender = ({ navigation }) => {
         }
 
     }, [weatherData])
-    
+
+
 
     const getWeatherData = async () => {
         setLoading('weatherFetching');
@@ -211,7 +212,7 @@ const CropRecommender = ({ navigation }) => {
                     setPredictedCrop(result.prediction);
                     setCropVisible(true);
                     setLoading(false);
-
+                    saveHistory(result.prediction);
                 })
                 .catch(error => console.log('error', error));
 
@@ -219,17 +220,15 @@ const CropRecommender = ({ navigation }) => {
 
     }
 
-    const saveHistory = () => {
+    const saveHistory = (crop) => {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         myHeaders.append("Authorization", `Bearer ${accessToken}`);
-        console.log(`Bearer ${accessToken}`)
-
+        
         var raw = JSON.stringify({
             "details": [nitrogen, phosphorus, potassium, temperature.toString(), humidity.toString(), pH, rainfall.toString()],
-            "cropSuggested": predictedCrop
+            "cropSuggested": crop
         });
-        console.log(raw)
 
         var requestOptions = {
             method: 'POST',
@@ -240,12 +239,12 @@ const CropRecommender = ({ navigation }) => {
 
         fetch("https://growmoreweb.herokuapp.com/v1/model/history", requestOptions)
             .then((response) => {
-                // if (response.ok)
+                if (response.ok)
                 return response.json()
-                // else
-                //   throw 'History API error : ' + response.status;
+                else
+                  throw 'History API error : ' + response.status;
             })
-            .then(result => console.log(result))
+            .then(result => console.log("history success"))
             .catch(error => console.warn(error));
     }
 
@@ -274,7 +273,7 @@ const CropRecommender = ({ navigation }) => {
                             editable={!(loading === 'toWeather')}
                             onChangeText={(text) => setPhosphorus(text)}
                             value={phosphorus}
-                            placeholder="Enter value of Nitrogen"
+                            placeholder="Enter value of Phosphorus"
                             autoCapitalize="none"
                             keyboardType="numeric"
                         />
@@ -285,7 +284,7 @@ const CropRecommender = ({ navigation }) => {
                             editable={!(loading === 'toWeather')}
                             onChangeText={(text) => setPotassium(text)}
                             value={potassium}
-                            placeholder="Enter value of Nitrogen"
+                            placeholder="Enter value of Potassium"
                             autoCapitalize="none"
                             keyboardType="numeric"
                         />
@@ -295,7 +294,7 @@ const CropRecommender = ({ navigation }) => {
                             editable={!(loading === 'toWeather')}
                             onChangeText={(text) => setpH(text)}
                             value={pH}
-                            placeholder="Enter value of Nitrogen"
+                            placeholder="Enter value of pH"
                             autoCapitalize="none"
                             keyboardType="numeric"
                         />

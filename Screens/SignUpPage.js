@@ -24,14 +24,7 @@ const SignUpPage = ({ navigation }) => {
   const [email, setEmail] = useState("")
   const [passHidden, setPassHidden] = useState(true);
   const [loading, setLoading] = useState();
-  const { login } = React.useContext(AuthContext);
-
-  const saveDataToStorage = async (userName, userEmail, accessToken) => {
-    await AsyncStorage.setItem(
-      "userData",
-      JSON.stringify({ name: userName, email: userEmail, token: accessToken, Status: 'success' })
-    );
-  };
+ 
   const SubmitSignUp = () => {
     if (!name) {
       showMessage({
@@ -83,13 +76,12 @@ const SignUpPage = ({ navigation }) => {
         .then(result => {
           
             showMessage({
-              message: "Signed Up Successfully !",
+              message: "Signed Up Successfully, Please login now!",
               type: "success",
               icon: "success",
               duration: 3500,
             });
-            saveDataToStorage(result.user.name, result.user.email, result.tokens.access.token)
-            login()
+            navigation.navigate('LoginPage');
           
         })
         .finally(() => setLoading(false))

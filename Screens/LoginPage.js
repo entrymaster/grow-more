@@ -69,7 +69,7 @@ const LoginPage = ({ navigation }) => {
           if (response.ok)
             return response.json()
           else
-            throw 'SignUp API error : ' + response.status;
+            throw 'Login API error : ' + response.status;
         })
         .then((result) => {
           

@@ -52,13 +52,14 @@ export const TabNavigation = (props) => {
   return (
     <BottomTab.Navigator
       screenOptions={({ route, navigation }) => ({
+
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           if (route.name === "News") {
             iconName = focused ? "newspaper-variant" : "newspaper-variant-outline";
           } else if (route.name === "Recommender") {
             iconName = focused ? "thumb-up" : "thumb-up-outline";
-          }  else if (route.name === "Dashboard") {
+          } else if (route.name === "Dashboard") {
             iconName = focused ? "view-dashboard" : "view-dashboard-outline";
           }
 
@@ -70,18 +71,15 @@ export const TabNavigation = (props) => {
             />
           );
         },
+        tabBarHideOnKeyboard: true,
+        tabBarActiveTintColor: "#2b5c4c",
+        tabBarInactiveTintColor: "grey",
+        tabBarStyle: [
+          {
+            display: "flex"
+          },]
       })}
-      tabBarOptions={{
-        keyboardHidesTabBar: true,
-        style: {
-          backgroundColor: "white",
-          justifyContent: "center",
-          alignItems: "center",
-          alignSelf: "center",
-        },
-        activeTintColor: "#2b5c4c",
-        inactiveTintColor: "grey",
-      }}
+     
     >
       <BottomTab.Screen
         name="News"
@@ -92,7 +90,7 @@ export const TabNavigation = (props) => {
           headerTitleStyle: { color: "#fff" },
         }}
       />
-  
+
       <BottomTab.Screen
         name="Recommender"
         component={CropRecommender}

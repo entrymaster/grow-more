@@ -1,30 +1,13 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 import {
   View,
   StyleSheet,
   Text,
 } from "react-native";
 import { Divider } from "react-native-elements";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome } from "@expo/vector-icons";
 
-const AboutInfo = () => {
-  const [status, setStatus] = useState(true);
-  const [userData, setUserData] = useState({});
-
-  useEffect(() => {
-    getUserData();
-   }, [])
-   
- 
-   const getUserData = useCallback(() => {
- 
-     AsyncStorage.getItem("userData").then((value) => {
-       let parseData = JSON.parse(value);
-       setUserData(parseData);
-     });
- 
-     }, [])
+const AboutInfo = ({userData}) => {
 
   const username = (name) => {
     var str = name;
@@ -49,15 +32,11 @@ const AboutInfo = () => {
       <Divider />
       <View style={{ flexDirection: "row" }}>
         <View style={styles.imageView}>
-          {status ? (
+          
             <View style={styles.ProfilePicBorder}>
               <Text style={styles.ProfilePicText}>{username(userData.name)}</Text>
             </View>
-          ) : (
-            <View>
-              <Image source={{ uri: image }} style={styles.ImageStyle} />
-            </View>
-          )}
+          
         </View>
 
         <View style={styles.nameAndCat}>
