@@ -1,23 +1,27 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { SideDrawer, Auth, StackNav } from "./GrowMoreNavigation";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
+import { Auth, StackNav } from "./GrowMoreNavigation";
 import { NavigationContainer } from "@react-navigation/native";
-import StartingScreen from "../Screens/StartingScreen";
 import { AuthContext } from "../Context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const AppNavigation = () => {
   const [storage, setStorage] = useState();
-  const [isLoading, setIsloading] = useState(true);
-  console.log(storage)
+
   useEffect(() => {
- 
+    getUserData();
+  }, [])
+
+
+  const getUserData = useCallback(() => {
+
     AsyncStorage.getItem("userData").then((value) => {
       let parseData = JSON.parse(value);
       setStorage(parseData);
 
-     
+
     });
-  }, []);
+
+  }, [])
 
   const authContext = useMemo(() => {
     return {
@@ -26,9 +30,6 @@ export const AppNavigation = () => {
       },
       signUp: () => {
         setStorage("userSignup");
-      },
-      skip: () => {
-        setStorage("skip");
       },
       logOut: () => {
         setStorage(null);
@@ -39,7 +40,7 @@ export const AppNavigation = () => {
   return (
     <AuthContext.Provider value={authContext}>
       <NavigationContainer>
-        { storage ? <StackNav /> : <Auth />}
+        {storage ? <StackNav /> : <Auth />}
       </NavigationContainer>
     </AuthContext.Provider>
   );

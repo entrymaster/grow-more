@@ -20,18 +20,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const SignUpPage = ({ navigation }) => {
 
   const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("")
   const [passHidden, setPassHidden] = useState(true);
   const [loading, setLoading] = useState();
   const { login } = React.useContext(AuthContext);
-  const { skip } = React.useContext(AuthContext);
 
-  const saveDataToStorage = (loginStatus, accessToken) => {
-    AsyncStorage.setItem(
+  const saveDataToStorage = async (userName, userEmail, accessToken) => {
+    await AsyncStorage.setItem(
       "userData",
-      JSON.stringify({ Status: loginStatus, name: accessToken })
+      JSON.stringify({ name: userName, email: userEmail, token: accessToken, Status: 'success' })
     );
   };
   const SubmitSignUp = () => {
@@ -57,45 +55,14 @@ const SignUpPage = ({ navigation }) => {
         duration: 3500,
       });
     } else {
-      // setLoading(true)
-      // var myHeaders = new Headers();
-      // myHeaders.append("Content-Type", "application/json");
-
-      // var raw = JSON.stringify({
-      //   name: (name),
-      //   email: (email),
-      //   password: (password)
-      // });
-
-      // var requestOptions = {
-      //   method: 'POST',
-      //   headers: myHeaders,
-      //   body: raw,
-      //   // redirect: 'follow'
-      // };
-
-      // fetch(global.baseURL+"v1/auth/register", requestOptions)
-      //   .then(response => response.json())
-      //   .then(result => {
-      //     console.log(result);
-      //     showMessage({
-      //       message: "Signed Up Successfully !",
-      //       type: "success",
-      //       icon: "success",
-      //       duration: 3500,
-      //   });
-      //     saveDataToStorage("success", result.tokens.access.token)
-      //     login()
-      //   })
-      //   .finally(() => setLoading(false))
-      //   .catch(error => console.log('error', error));
+      setLoading(true)
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
       var raw = JSON.stringify({
-        "name": (name),
-        "email": (email),
-        "password": (password)
+        "name": name,
+        "email": email,
+        "password": password
       });
 
       var requestOptions = {
@@ -105,27 +72,28 @@ const SignUpPage = ({ navigation }) => {
         redirect: 'follow'
       };
 
-      fetch("https://grow-more-backend.herokuapp.com/v1/auth/register", requestOptions)
-        .then(response => {
-          if (!response.ok) {
-            alert("Something went wrong");
-          }
-          return response.text()
+
+      fetch("https://growmoreweb.herokuapp.com/v1/auth/register", requestOptions)
+        .then((response) => {
+          if (response.ok)
+            return response.json();
+          else
+            throw 'SignUp API error : ' + response.status;
         })
         .then(result => {
-          console.log(result);
-          if (result.user !== undefined) {
+          
             showMessage({
               message: "Signed Up Successfully !",
               type: "success",
               icon: "success",
               duration: 3500,
             });
-            saveDataToStorage("success", result.user.name)
+            saveDataToStorage(result.user.name, result.user.email, result.tokens.access.token)
             login()
-          }
+          
         })
-        .catch(error => console.log('error', error));
+        .finally(() => setLoading(false))
+        .catch(error => console.warn(error));
     }
   };
 
@@ -155,14 +123,7 @@ const SignUpPage = ({ navigation }) => {
                     value={name}
                     autoCapitalize="none"
                   />
-                  {/* <Text style={styles.inputBoxLabel}>create username</Text>
-                <TextInput
-                  selectionColor="#FFFFFF"
-                  style={styles.inputBox}
-                  onChangeText={(text) => setUsername(text)}
-                  value={username}
-                  autoCapitalize="none"
-                /> */}
+                
                   <Text style={styles.inputBoxLabel}>your email</Text>
                   <TextInput
                     selectionColor="#FFFFFF"
@@ -171,7 +132,7 @@ const SignUpPage = ({ navigation }) => {
                     value={email}
                     autoCapitalize="none"
                   />
-                  <Text style={styles.inputBoxLabel}>Password</Text>
+                  <Text style={styles.inputBoxLabel}>password</Text>
                   <View>
                     <View style={{ flexDirection: 'row', marginRight: 25 }}>
                       <TextInput
@@ -196,9 +157,7 @@ const SignUpPage = ({ navigation }) => {
                         />
                       </TouchableOpacity>
                     </View>
-                    {/* <TouchableOpacity>
-                    <Text style={styles.forgotText}>Forgot Password?</Text>
-                  </TouchableOpacity> */}
+                   
                   </View>
                   <TouchableOpacity
                     activeOpacity={1}
@@ -238,23 +197,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   input: {
-    // marginTop: 40,
     height: 40,
     margin: 12,
     borderWidth: 1,
     padding: 10,
   },
-
   logoImg: {
     height: 200,
-    // flex:1,
     width: 200,
     marginVertical: 30,
     alignSelf: "center",
     resizeMode: "contain",
   },
   fieldContainer: {
-    // marginTop: 20,
     marginBottom: 20,
     height: '65%',
     paddingHorizontal: 30,
@@ -283,16 +238,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 18,
     color: "#FFFFFF",
-    // height:'8%'
     marginTop: 25,
   },
   eyeIcon: {
     borderBottomWidth: 1,
     padding: 1,
-    //   marginRight:10,
     borderBottomColor: '#fff'
-    // position: "absolute",
-    // right: 5,top: 0, left: 0, right: 0, bottom: 0,
   },
   forgotText: {
     alignSelf: "flex-end",

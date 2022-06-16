@@ -6,7 +6,7 @@ import FlashMessage from "react-native-flash-message";
 
 export default function App() {
 
-  global.baseURL = 'localhost:8081/'
+  
   return (
     <View style={styles.container}>
       <AppNavigation /> 

@@ -8,7 +8,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   KeyboardAvoidingView,
-  ActivityIndicator
+  ActivityIndicator,
+  ScrollView
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -23,14 +24,14 @@ const LoginPage = ({ navigation }) => {
   const [passHidden, setPassHidden] = useState(true);
   const [loading, setLoading] = useState();
   const { login } = React.useContext(AuthContext);
-  const { skip } = React.useContext(AuthContext);
 
-  const saveDataToStorage = (loginStatus, accessToken) => {
-    AsyncStorage.setItem(
+  const saveDataToStorage = async (userName, userEmail, accessToken) => {
+    await AsyncStorage.setItem(
       "userData",
-      JSON.stringify({ Status: loginStatus, name: accessToken })
+      JSON.stringify({ name: userName, email: userEmail, token: accessToken, Status: 'success' })
     );
   };
+
   const SubmitLogin = () => {
     if (!loginID) {
       showMessage({
@@ -47,6 +48,7 @@ const LoginPage = ({ navigation }) => {
         duration: 3500,
       });
     } else {
+      setLoading(true);
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
@@ -54,7 +56,6 @@ const LoginPage = ({ navigation }) => {
         "email": loginID,
         "password": password
       });
-      console.log(raw)
 
       var requestOptions = {
         method: 'POST',
@@ -63,21 +64,27 @@ const LoginPage = ({ navigation }) => {
         redirect: 'follow'
       };
 
-      fetch("https://grow-more-backend.herokuapp.com/v1/auth/login", requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-          if (result.user !== undefined) {
+      fetch("https://growmoreweb.herokuapp.com/v1/auth/login", requestOptions)
+        .then((response) => {
+          if (response.ok)
+            return response.json()
+          else
+            throw 'SignUp API error : ' + response.status;
+        })
+        .then((result) => {
+          
             showMessage({
               message: "Logged In Successfully !",
               type: "success",
               icon: "success",
               duration: 3500,
             });
-            saveDataToStorage("name", result.user.name)
+            saveDataToStorage(result.user.name, result.user.email, result.tokens.access.token)
             login()
-          }
+  
         })
-        .catch(error => console.log('error', error));
+        .finally(() => setLoading(false))
+        .catch(error => console.warn(error));
     }
   };
 
@@ -85,74 +92,72 @@ const LoginPage = ({ navigation }) => {
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <LinearGradient style={{ flex: 1, justifyContent: 'space-around' }} colors={["#91EAE4", "#2b5c4c"]}>
-          <KeyboardAvoidingView
-            behavior={"position"}
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}>
+            <KeyboardAvoidingView behavior={"position"}>
+              <View>
 
-
-          >
-            <View>
-
-              <Image
-                style={styles.logoImg}
-                source={require("../assets/logo.png")}
-              />
-
-              <View style={styles.fieldContainer}>
-                <Text style={styles.headingText}>Login</Text>
-                <View style={styles.horizontalLine} />
-                <Text style={styles.inputBoxLabel}>Email</Text>
-                <TextInput
-                  selectionColor="#FFFFFF"
-                  style={styles.inputBox}
-                  onChangeText={(text) => setLoginID(text)}
-                  value={loginID}
-                  keyboardAppearance={'dark'}
-                  autoCapitalize="none"
+                <Image
+                  style={styles.logoImg}
+                  source={require("../assets/logo.png")}
                 />
-                <Text style={styles.inputBoxLabel}>Password</Text>
-                <View>
-                  <View style={{ flexDirection: 'row', marginRight: 25 }}>
-                    <TextInput
-                      selectionColor="#FFFFFF"
-                      secureTextEntry={passHidden}
-                      style={styles.inputBox}
-                      onChangeText={(text) => setPassword(text)}
-                      value={password}
-                      autoCapitalize="none"
-                    />
-                    <TouchableOpacity
-                      activeOpacity={1}
-                      style={styles.eyeIcon}
-                      onPress={() => setPassHidden(!passHidden)}
-                    >
-                      <Ionicons
-                        name={
-                          passHidden ? "ios-eye-off-outline" : "ios-eye-outline"
-                        }
-                        size={25}
-                        color="white"
+
+                <View style={styles.fieldContainer}>
+                  <Text style={styles.headingText}>Login</Text>
+                  <View style={styles.horizontalLine} />
+                  <Text style={styles.inputBoxLabel}>Email</Text>
+                  <TextInput
+                    selectionColor="#FFFFFF"
+                    style={styles.inputBox}
+                    onChangeText={(text) => setLoginID(text)}
+                    value={loginID}
+                    keyboardAppearance={'dark'}
+                    autoCapitalize="none"
+                  />
+                  <Text style={styles.inputBoxLabel}>Password</Text>
+                  <View>
+                    <View style={{ flexDirection: 'row', marginRight: 25 }}>
+                      <TextInput
+                        selectionColor="#FFFFFF"
+                        secureTextEntry={passHidden}
+                        style={styles.inputBox}
+                        onChangeText={(text) => setPassword(text)}
+                        value={password}
+                        autoCapitalize="none"
                       />
-                    </TouchableOpacity>
+                      <TouchableOpacity
+                        activeOpacity={1}
+                        style={styles.eyeIcon}
+                        onPress={() => setPassHidden(!passHidden)}
+                      >
+                        <Ionicons
+                          name={
+                            passHidden ? "ios-eye-off-outline" : "ios-eye-outline"
+                          }
+                          size={25}
+                          color="white"
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={styles.forgotText}></Text>
                   </View>
-                  <TouchableOpacity>
-                    <Text style={styles.forgotText}>Forgot Password?</Text>
+                  <TouchableOpacity
+                    activeOpacity={1}
+                    style={styles.loginBtn}
+                    onPress={() => SubmitLogin()}
+                  >
+                    {loading ? (
+                      <ActivityIndicator color={"#F02F39"} />
+                    ) : (
+                      <Text style={styles.loginBtnText}>Login</Text>
+                    )}
                   </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                  activeOpacity={1}
-                  style={styles.loginBtn}
-                  onPress={() => SubmitLogin()}
-                >
-                  {loading ? (
-                    <ActivityIndicator color={"#F02F39"} />
-                  ) : (
-                    <Text style={styles.loginBtnText}>Login</Text>
-                  )}
-                </TouchableOpacity>
-              </View>
 
-            </View>
-          </KeyboardAvoidingView>
+              </View>
+            </KeyboardAvoidingView>
+          </ScrollView>
           <View style={styles.bottomTextView}>
             <Text style={styles.bottomText}>Don't have an account? </Text>
             <TouchableOpacity
@@ -175,7 +180,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   input: {
-    // marginTop: 40,
     height: 40,
     margin: 12,
     borderWidth: 1,
@@ -189,16 +193,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
   },
   logoImg: {
-    height: 250,
-    // flex:1,
-    width: 250,
-    // marginVertical: 30,
+    height: 220,
+    width: 220,
+    marginVertical: 50,
     alignSelf: "center",
     resizeMode: "contain",
   },
   fieldContainer: {
-    // marginTop: 20,
-    // paddingBottom: 10,
+    marginBottom: 20,
+    height: '60%',
     paddingHorizontal: 30,
 
   },
@@ -231,10 +234,7 @@ const styles = StyleSheet.create({
   eyeIcon: {
     borderBottomWidth: 1,
     padding: 1,
-    //   marginRight:10,
     borderBottomColor: '#fff'
-    // position: "absolute",
-    // right: 5,top: 0, left: 0, right: 0, bottom: 0,
   },
   forgotText: {
     alignSelf: "flex-end",
@@ -260,6 +260,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   bottomTextView: {
+    marginBottom: 20,
     flexDirection: "row",
     alignSelf: "center",
   },

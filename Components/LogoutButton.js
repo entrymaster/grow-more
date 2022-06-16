@@ -10,7 +10,7 @@ export const LogoutButton = () => {
         const clearData = await AsyncStorage.clear();
 
         AsyncStorage.getItem("userData").then((value) => {
-            let parseData = JSON.parse(value);  
+            let parseData = JSON.parse(value);
             console.log(parseData);
         })
 
@@ -31,8 +31,8 @@ export const LogoutButton = () => {
         );
     };
     return (
-        <TouchableOpacity style={{ padding: 8, backgroundColor: 'red', borderRadius: 10 }} onPress={() => LogOutPressed()}>
-            <Text style={{ fontSize: 16, color: '#fff' }}>Logout</Text>
+        <TouchableOpacity style={{ padding: 6, backgroundColor: 'red', borderRadius: 5, marginRight:10 }} onPress={() => LogOutPressed()}>
+            <Text style={{ fontSize: 15, color: '#fff' }}>Logout</Text>
         </TouchableOpacity>
     )
 }

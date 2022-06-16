@@ -1,16 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, Image, ActivityIndicator, ImageBackground, Touchable } from 'react-native';
+import React from 'react';
+import { StyleSheet, View, Text, Image } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 
 const StartingScreen = ({ navigation }) => {
-  const [isLoading, setIsloading] = useState(true);
-  setTimeout(() => {
-    setIsloading(false);
-  }, 1000);
-  useEffect(() => {
-    setIsloading(true)
-  }, [])
+
   return (
     <View style={styles.container}>
       <View style={styles.headingContainer}>
@@ -21,13 +15,11 @@ const StartingScreen = ({ navigation }) => {
         style={styles.logoImg}
         source={require("../assets/starting-banner.png")}
       />
-      {
-        isLoading ? <ActivityIndicator size="large" color="white"
-          style={{ flex: 1, bottom: 50, position: 'absolute', alignSelf: 'center' }}
-        />
-          :
-          <TouchableOpacity onPress={() => navigation.navigate('LoginPage')}><Text style={styles.button}>Let's Get Started</Text></TouchableOpacity>
-      }
+
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('LoginPage')}>
+        <Text style={styles.buttonText}>Let's Get Started</Text>
+      </TouchableOpacity>
+
     </View>
   );
 
@@ -61,9 +53,7 @@ const styles = StyleSheet.create({
   },
   logoImg: {
     height: 350,
-    // flex:1,
     width: 350,
-    // marginVertical:'10%',
     alignSelf: 'center',
     resizeMode: "contain",
   },
@@ -71,16 +61,15 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 10,
     marginHorizontal: 10,
+    backgroundColor: '#5b8462',
+    marginTop:'20%',
+    elevation: 10,
+    shadowColor: '#000'
+  },
+  buttonText:{
     color: '#fff',
     fontSize: 20,
     textAlign: 'center',
-    backgroundColor: '#5b8462',
-    // marginTop:'20%'
-    //   position:'absolute',
-    //   bottom: 100
-    //   marginTop:140
-    //   shadowColor:'#fff',
-    //   elevation:2
   }
 })
 

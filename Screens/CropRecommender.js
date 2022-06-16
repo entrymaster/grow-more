@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from 'react-native'
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -17,13 +17,12 @@ const CropRecommender = ({ navigation }) => {
     const BASE_WEATHER_URL = "https://history.openweathermap.org/data/2.5/aggregated/month?";
 
     const [userLocation, setUserLocation] = useState();
-    const [autoWeatherFetch, setAutoWeatherFetch] = useState(false);
     const [weatherData, setWeatherData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [visible, setVisible] = useState(false);
     const [formProgress, setFormProgress] = useState('soil');
     const [cropVisible, setCropVisible] = useState(false)
-    const [accessToken, setAccessToken] = useState('')
+    const [accessToken, setAccessToken] = useState('');
 
     //data states
     const [nitrogen, setNitrogen] = useState('');
@@ -35,28 +34,11 @@ const CropRecommender = ({ navigation }) => {
     const [humidity, setHumidity] = useState('');
     const [predictedCrop, setPredictedCrop] = useState(null);
 
-
-    // useEffect(() => {
-    //    if(cropVisible !== null)
-    //    {
-
-    //    }
-    // }, [predictedCrop])
-
-    // useEffect(() => {
-
-    //     AsyncStorage.getItem("userData").then((value) => {
-    //         let parseData = JSON.parse(value);
-    //         setAccessToken(parseData.accessToken);
-
-
-    //     });
-    // }, []);
-
     useEffect(() => {
-        fetchLocation()
+        fetchLocation();
+        getUserData();
     }, [])
-    
+
 
     useEffect(() => {
         if (weatherData !== null) {
@@ -66,6 +48,7 @@ const CropRecommender = ({ navigation }) => {
         }
 
     }, [weatherData])
+    
 
     const getWeatherData = async () => {
         setLoading('weatherFetching');
@@ -82,6 +65,16 @@ const CropRecommender = ({ navigation }) => {
                 }
             });
     }
+
+    const getUserData = useCallback(() => {
+
+        AsyncStorage.getItem("userData").then((value) => {
+            let parseData = JSON.parse(value);
+            setAccessToken(parseData.token);
+        });
+
+    }, [])
+
 
     const submit = () => {
         if (!nitrogen) {
@@ -116,42 +109,27 @@ const CropRecommender = ({ navigation }) => {
             setLoading('toWeather');
             setTimeout(() => {
                 setLoading(false);
-                // setFormProgress('weather')
                 setVisible(true);
-                // navigation.navigate('WeatherFetch')
             }, 200);
         }
 
     }
 
-    // const AutoWeatherFetch = () =>{
-    //     setLoading('weatherFetching');
-    //     setAutoWeatherFetch(true);
-    // }
-
     const fetchLocation = async () => {
-        
+
         if (Platform.OS === 'android' && !Constants.isDevice) {
-            setErrorMsg(
-                'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
-            );
+            console.warn("Oops, location fetching doesn't work on Android emulator. Try it on your device!")
             return;
         }
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-            setErrorMsg('Permission to access location was denied');
+            alert('Permission to access location was denied');
             return;
         }
 
         let location = await Location.getCurrentPositionAsync({});
-        // setLocation(location);
         setUserLocation(location.coords);
-        // setTimeout(() => {
-        //     if (userLocation) {
-                
-        //     }
 
-        // }, 200);
     }
 
     const goBack = () => {
@@ -210,13 +188,13 @@ const CropRecommender = ({ navigation }) => {
                 duration: 3500,
             });
         } else {
-           
-           setLoading('predict')
+
+            setLoading('predict')
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
 
             var raw = JSON.stringify({
-                "values": `${nitrogen}`+" "+`${phosphorus}`+" "+`${potassium}`+" "+`${temperature.toString()}`+" "+`${humidity.toString()}`+" "+`${pH}`+" "+`${rainfall.toString()}`
+                "values": `${nitrogen}` + " " + `${phosphorus}` + " " + `${potassium}` + " " + `${temperature.toString()}` + " " + `${humidity.toString()}` + " " + `${pH}` + " " + `${rainfall.toString()}`
             });
 
             var requestOptions = {
@@ -232,12 +210,43 @@ const CropRecommender = ({ navigation }) => {
                     // alert()
                     setPredictedCrop(result.prediction);
                     setCropVisible(true);
-                    setLoading(false)
+                    setLoading(false);
+
                 })
                 .catch(error => console.log('error', error));
 
         }
 
+    }
+
+    const saveHistory = () => {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("Authorization", `Bearer ${accessToken}`);
+        console.log(`Bearer ${accessToken}`)
+
+        var raw = JSON.stringify({
+            "details": [nitrogen, phosphorus, potassium, temperature.toString(), humidity.toString(), pH, rainfall.toString()],
+            "cropSuggested": predictedCrop
+        });
+        console.log(raw)
+
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+        };
+
+        fetch("https://growmoreweb.herokuapp.com/v1/model/history", requestOptions)
+            .then((response) => {
+                // if (response.ok)
+                return response.json()
+                // else
+                //   throw 'History API error : ' + response.status;
+            })
+            .then(result => console.log(result))
+            .catch(error => console.warn(error));
     }
 
     const DisplaySwitch = () => {
@@ -380,12 +389,8 @@ const CropRecommender = ({ navigation }) => {
     }
 
     return (
-        // <View>
-        //     {autoWeatherFetch && <FetchLocation setUserLocation={setUserLocation} />}
 
-        // </View>
         <View style={styles.container}>
-            {/* {autoWeatherFetch && <FetchLocation setUserLocation={setUserLocation} />} */}
             <LinearGradient style={{ flex: 1, justifyContent: 'space-around' }} colors={["#f5f7fa", "#c3cfe2"]}>
 
 
@@ -443,7 +448,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        // marginTop: Constants.statusBarHeight
     },
     heading: {
         color: '#36454f',
@@ -457,7 +461,6 @@ const styles = StyleSheet.create({
         paddingLeft: 15
     },
     fieldContainer: {
-        // alignItems: 'center'
         marginVertical: 30
     },
     label: {
@@ -470,7 +473,6 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: 'rgb(192,192,192)',
         width: '92%',
-        // marginVertical: 10,
         height: 55,
         borderRadius: 10,
         fontSize: 18,
