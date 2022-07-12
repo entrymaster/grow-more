@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Image, Text, View, FlatList } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {NEWS_API_KEY} from "@env"
 
 const DateFormatter = (value) => {
     let date = value.split('T')[0].split('-');
@@ -42,9 +43,9 @@ const News = () => {
     AsyncStorage.getItem("userData").then((value) => {
         let parseData = JSON.parse(value);
         console.log(parseData);
-  
-       
-      });
+
+
+    });
 
     const [news, setNews] = useState('');
 
@@ -54,7 +55,7 @@ const News = () => {
         fetch('https://newsapi.org/v2/everything?' + 'qInTitle=' + keyWord, {
             method: 'GET',
             headers: {
-                'x-api-key': '039dbafbe6ac4d06a5b615b8ce0afd14',
+                'x-api-key': NEWS_API_KEY,
             },
         })
             .then((response) => response.json())
@@ -97,9 +98,7 @@ const News = () => {
                     </View>
                 )}
             />
-            {/* <TouchableOpacity>
-                <Text style={styles.bottomText}>View More</Text>
-            </TouchableOpacity> */}
+
         </View>
     );
 };
@@ -150,26 +149,21 @@ const styles = StyleSheet.create({
         flex: 1
     },
     itemContainer: {
-        // flexDirection: "row",
-        // paddingTop: 20,
-        // marginVertical:20,
-        paddingVertical:20,
+
+        paddingVertical: 20,
         backgroundColor: "white",
-        paddingHorizontal:10,
-    // alignSelf: "center",
-
-    padding: 1,
-    margin: 10,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-
-    elevation: 5,
+        paddingHorizontal: 10,
+        padding: 1,
+        margin: 10,
+        borderRadius: 10,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 10,
+        elevation: 5,
     },
     articleImage: {
         alignSelf: 'center',

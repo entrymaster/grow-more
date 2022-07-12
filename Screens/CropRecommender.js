@@ -8,11 +8,11 @@ import { Overlay } from "react-native-elements";
 import { showMessage } from "react-native-flash-message";
 import * as Location from 'expo-location';
 import SuccessOverlay from '../Components/SuccessOverlay';
+import {WEATHER_API_KEY} from "@env"
 
 
-const CropRecommender = ({ navigation }) => {
+const CropRecommender = () => {
 
-    const WEATHER_API_KEY = "e42534a7855aa5e8decbe255df993856";
     const BASE_WEATHER_URL = "https://history.openweathermap.org/data/2.5/aggregated/month?";
 
     const [userLocation, setUserLocation] = useState();
@@ -49,10 +49,10 @@ const CropRecommender = ({ navigation }) => {
     }, [weatherData])
 
 
-
     const getWeatherData = async () => {
         setLoading('weatherFetching');
-        const requestURL = BASE_WEATHER_URL + "month=12&lat=" + userLocation.latitude + "&lon=" + userLocation.longitude + "&appid=" + WEATHER_API_KEY;
+        const requestURL = BASE_WEATHER_URL + "month=12&lat=" + userLocation.latitude + "&lon=" 
+            + userLocation.longitude + "&appid=" + WEATHER_API_KEY;
 
         await fetch(requestURL)
             .then(res => res.json())
