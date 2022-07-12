@@ -3,7 +3,6 @@ import { StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard, 
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
-// import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Overlay } from "react-native-elements";
 import { showMessage } from "react-native-flash-message";

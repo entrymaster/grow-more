@@ -34,9 +34,8 @@ const History = ({ token }) => {
             })
             .then(result => setHistoryData(result.history))
             .finally(() => setLoading(false))
-            .catch(error => console.log(error));
+            .catch(error => console.warn(error));
     }
-    console.log(historyData)
 
     const renderItem = ({ item, index }) => {
 
